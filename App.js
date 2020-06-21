@@ -16,7 +16,6 @@ import {
   StatusBar,
   TouchableOpacity,
 } from 'react-native';
-// import Dates from 'react-native-dates';
 import moment from 'moment';
 import Date from "./src/Date";
 import ModalComponent from "./src/Components/ModalComponent"
@@ -92,7 +91,6 @@ export default class App extends Component {
             endDate={this.state.endDate}
             focusedInput={this.state.focus}
             title={"Apply Leave"}
-            // focusedMonth={moment('05/09/2030', 'DD/MM/YYYY')}
             range
           />
           <View style={styles.boxOuter}>
@@ -191,38 +189,7 @@ export default class App extends Component {
               </View>
             </Modal>
           </View>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          {/* {this.state.date && <Text style={styles.date}>{this.state.date && this.state.date.format('LL')}</Text>} */}
-          {/* <View style={{ flex: 1, backgroundColor: "green", height: 88 }}>
-            <Text style={[styles.date, this.state.focus === 'startDate' && styles.focused]}>{this.state.startDate && this.state.startDate.format('LL')}</Text>
-          </View> */}
-          {/* <Text style={[styles.date, this.state.focus === 'endDate' && styles.focused]}>{this.state.endDate && this.state.endDate.format('LL')}</Text> */}
         </ScrollView>
-
       </View>
     );
   }
@@ -304,46 +271,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
 
   },
-
-
-
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5
-  },
-  openButton: {
-    backgroundColor: "#F194FF",
-    borderRadius: 20,
-    padding: 10,
-    elevation: 2
-  },
-  textStyle: {
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "center"
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center"
-  }
-
 });
 
 AppRegistry.registerComponent('App', () => App);
