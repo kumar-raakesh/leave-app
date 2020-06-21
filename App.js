@@ -1,45 +1,52 @@
 /**
  * Sample React Native App
  * https://github.com/facebook/react-native
-//  *
-//  * @format
-//  * @flow strict-local
-//  */
-
-
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
  * @flow
  */
-
-
-
-
-
-
-
-
 import React, { Component } from 'react';
 import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  View,
+  Image,
+  Modal,
+  ScrollView,
+  TextInput,
+  StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 // import Dates from 'react-native-dates';
 import moment from 'moment';
-import Date from "./src/Date"
-
+import Date from "./src/Date";
+import ModalComponent from "./src/Components/ModalComponent"
 export default class App extends Component {
-  state = {
-    date: null,
-    focus: 'startDate',
-    startDate: null,
-    endDate: null
+  constructor(props) {
+    super(props)
+    this.state = {
+      date: null,
+      todate: null,
+      focus: 'startDate',
+      startDate: null,
+      endDate: null,
+      text: "",
+      fromDate: false,
+      modalVisible: false,
+      fromDateVisible: false,
+      toDateVisible: false,
+
+    }
   }
 
   render() {
+    var a = moment(
+      [this.state.startDate && this.state.startDate.format('DD-MM-YYYY') || this.state.date && this.state.date.format('DD-MM-YYYY')]
+    );
+    var b = moment([
+      this.state.endDate && this.state.endDate.format('DD-MM-YYYY') || this.state.todate && this.state.todate.format('DD-MM-YYYY')]
+    );
+    var diffDays = a.diff(b, 'days')
+    const { startDate, endDate, text, date, todate } = this.state
     const isDateBlocked = (date) =>
       date.isBefore(moment(), 'day');
 
@@ -48,179 +55,295 @@ export default class App extends Component {
         this.setState({ ...this.state, startDate, endDate })
       );
 
-    const onDateChange = ({ date }) =>
-      this.setState({ ...this.state, date });
+    const onDateChange = ({ date }) => {
+      if (this.state.fromDate) {
+        this.setState({
+          ...this.state,
+          date,
+          fromDateVisible: false,
+          fromDate: false
+        });
+      } else {
+        this.setState({
+          ...this.state,
+          todate: date,
+          fromDateVisible: false,
+        });
+      }
+    }
 
     return (
       <View style={styles.container}>
-        <Date
-          onDatesChange={onDatesChange}
-          isDateBlocked={isDateBlocked}
-          startDate={this.state.startDate}
-          endDate={this.state.endDate}
-          focusedInput={this.state.focus}
-          // focusedMonth={moment('05/09/2030', 'DD/MM/YYYY')}
-          range
+        <StatusBar
+          barStyle="light-content"
         />
+        <View style={styles.header}>
+          <View style={styles.title}>
+            <Text style={styles.titleText}>
+              Apply Leave
+            </Text>
+          </View>
+        </View>
+        <ScrollView>
+          <Date
+            onDatesChange={onDatesChange}
+            isDateBlocked={isDateBlocked}
+            startDate={this.state.startDate}
+            endDate={this.state.endDate}
+            focusedInput={this.state.focus}
+            title={"Apply Leave"}
+            // focusedMonth={moment('05/09/2030', 'DD/MM/YYYY')}
+            range
+          />
+          <View style={styles.boxOuter}>
+            <View style={styles.dateBox}>
+              <Text style={styles.fromDate}>{this.state.startDate && this.state.startDate.format('DD-MM-YYYY') || this.state.date && this.state.date.format('DD-MM-YYYY')}</Text>
+            </View>
+            <TouchableOpacity style={styles.calImage} onPress={() => {
+              this.setState({
+                fromDateVisible: true,
+                fromDate: true,
+              })
+            }}>
+              <Image source={require("./src/image/cal-icons.png")}
+                style={{
+                  height: 30,
+                  width: 30
+                }}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.boxOuter}>
+            <View style={styles.dateBox}>
+              <Text style={styles.fromDate}>{this.state.endDate && this.state.endDate.format('DD-MM-YYYY') || this.state.todate && this.state.todate.format('DD-MM-YYYY')}</Text>
+            </View>
+            <TouchableOpacity style={styles.calImage} onPress={() => {
+              this.setState({
+                fromDateVisible: true,
+                toDate: true
+              })
+            }}>
+              <Image source={require("./src/image/cal-icons.png")}
+                style={{
+                  height: 30,
+                  width: 30
+                }}
+              />
+            </TouchableOpacity>
+          </View>
 
-        {/* <Date
-          date={this.state.date}
-          onDatesChange={onDateChange}
-          isDateBlocked={isDateBlocked}
-        /> */}
+          <View style={[styles.boxOuter, { height: 100, }]}>
+            <TextInput
+              onChangeText={(text) => this.setState({ text })}
+              value={this.state.text}
+              placeholder="Reason For Leave... "
+              maxLength={200}
+              multiline={true}
+              style={{ paddingLeft: 15, paddingTop: 12, fontSize: 14 }}
+            />
+          </View>
+          <View style={styles.buttonOuter}>
+            <TouchableOpacity
+              disabled={startDate || date && endDate || todate && text.length ? false : true}
+              style={[styles.buttonInner, {
+              }]}
+              onPress={() => {
+                this.setState({ modalVisible: true })
+                console.log("Leave from ", this.state.startDate.format('DD-MM-YYYY') + "to", this.state.endDate.format('DD-MM-YYYY'))
+              }}>
+              <Text style={styles.buttonLabel}>
+                Apply
+            </Text>
+            </TouchableOpacity>
+            <Modal
+              visible={this.state.modalVisible}
+              transparent={true}
+              onRequestClose={() => {
+                this.setState({ modalVisible: false });
+              }}
+            >
+              <ModalComponent
+                diffDays={diffDays}
+                onCloseModal={() => {
+                  this.setState({
+                    modalVisible: false,
+                    startDate: null,
+                    endDate: null,
+                    text: ""
+                  });
+                }}
+              />
+            </Modal>
 
-        {this.state.date && <Text style={styles.date}>{this.state.date && this.state.date.format('LL')}</Text>}
-        <Text style={[styles.date, this.state.focus === 'startDate' && styles.focused]}>{this.state.startDate && this.state.startDate.format('LL')}</Text>
-        <Text style={[styles.date, this.state.focus === 'endDate' && styles.focused]}>{this.state.endDate && this.state.endDate.format('LL')}</Text>
+            <Modal
+              visible={this.state.fromDateVisible}
+              transparent={true}
+              onRequestClose={() => {
+                this.setState({ fromDateVisible: false });
+              }}
+            >
+              <View style={{ flex: 1, marginTop: 50 }}>
+                <Date
+                  date={this.state.date}
+                  onDatesChange={onDateChange}
+                  isDateBlocked={isDateBlocked}
+                />
+              </View>
+            </Modal>
+          </View>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          {/* {this.state.date && <Text style={styles.date}>{this.state.date && this.state.date.format('LL')}</Text>} */}
+          {/* <View style={{ flex: 1, backgroundColor: "green", height: 88 }}>
+            <Text style={[styles.date, this.state.focus === 'startDate' && styles.focused]}>{this.state.startDate && this.state.startDate.format('LL')}</Text>
+          </View> */}
+          {/* <Text style={[styles.date, this.state.focus === 'endDate' && styles.focused]}>{this.state.endDate && this.state.endDate.format('LL')}</Text> */}
+        </ScrollView>
+
       </View>
     );
   }
 }
 
+
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexGrow: 1,
-    marginTop: 50
+    backgroundColor: "#ebedf6"
   },
   date: {
-    marginTop: 150
+    marginTop: 50
   },
   focused: {
     color: 'blue'
+  },
+  fromDate: {
+    fontSize: 16,
+    marginLeft: 16
+
+  },
+  boxOuter: {
+    flex: 1,
+    height: 48,
+    borderRadius: 4,
+    marginTop: 32,
+    flexDirection: "row",
+    marginHorizontal: 34,
+    backgroundColor: "#FFF",
+    justifyContent: "space-between",
+  },
+  dateBox: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  calImage: {
+    height: 50,
+    width: 50,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  buttonOuter: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 120,
+    marginTop: 40
+  },
+  buttonInner: {
+    flex: 1,
+    width: "60%",
+    borderRadius: 4,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#2e2c83",
+
+  },
+  buttonLabel: {
+    color: "#FFF",
+    fontSize: 18,
+    fontWeight: "500"
+  },
+  header: {
+    backgroundColor: "#2e2c83",
+    height: 60
+  },
+  title: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  titleText: {
+    fontSize: 18,
+    color: "#FFF",
+    fontWeight: "600",
+
+  },
+
+
+
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
   }
+
 });
 
 AppRegistry.registerComponent('App', () => App);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import React from 'react';
-// import {
-//   SafeAreaView,
-//   StyleSheet,
-//   ScrollView,
-//   View,
-//   Text,
-//   StatusBar,
-// } from 'react-native';
-
-// import {
-//   Header,
-//   LearnMoreLinks,
-//   Colors,
-//   DebugInstructions,
-//   ReloadInstructions,
-// } from 'react-native/Libraries/NewAppScreen';
-
-// const App: () => React$Node = () => {
-//   return (
-//     <>
-//       <StatusBar barStyle="dark-content" />
-//       <SafeAreaView>
-//         <ScrollView
-//           contentInsetAdjustmentBehavior="automatic"
-//           style={styles.scrollView}>
-//           <Header />
-//           {global.HermesInternal == null ? null : (
-//             <View style={styles.engine}>
-//               <Text style={styles.footer}>Engine: Hermes</Text>
-//             </View>
-//           )}
-//           <View style={styles.body}>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Step One</Text>
-//               <Text style={styles.sectionDescription}>
-//                 Edit <Text style={styles.highlight}>App.js</Text> to change this
-//                 screen and then come back to see your edits.
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>See Your Changes</Text>
-//               <Text style={styles.sectionDescription}>
-//                 <ReloadInstructions />
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Debug</Text>
-//               <Text style={styles.sectionDescription}>
-//                 <DebugInstructions />
-//               </Text>
-//             </View>
-//             <View style={styles.sectionContainer}>
-//               <Text style={styles.sectionTitle}>Learn More</Text>
-//               <Text style={styles.sectionDescription}>
-//                 Read the docs to discover what to do next:
-//               </Text>
-//             </View>
-//             <LearnMoreLinks />
-//           </View>
-//         </ScrollView>
-//       </SafeAreaView>
-//     </>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   scrollView: {
-//     backgroundColor: Colors.lighter,
-//   },
-//   engine: {
-//     position: 'absolute',
-//     right: 0,
-//   },
-//   body: {
-//     backgroundColor: Colors.white,
-//   },
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//     color: Colors.black,
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//     color: Colors.dark,
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-//   footer: {
-//     color: Colors.dark,
-//     fontSize: 12,
-//     fontWeight: '600',
-//     padding: 4,
-//     paddingRight: 12,
-//     textAlign: 'right',
-//   },
-// });
-
-// export default App;

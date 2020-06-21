@@ -2,96 +2,15 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
+  Image,
+  StyleSheet,
   TouchableOpacity,
-  StyleSheet
 } from 'react-native';
 import Moment from 'moment';
 import { extendMoment } from 'moment-range';
 
 const moment = extendMoment(Moment);
 
-
-// type DatesType = {
-//   range: boolean,
-//   date: ?moment,
-//   startDate: ?moment,
-//   endDate: ?moment,
-//   focusedInput: 'startDate' | 'endDate',
-//   onDatesChange: (date: { date?: ?moment, startDate?: ?moment, endDate?: ?moment }) => void,
-//   isDateBlocked: (date: moment) => boolean,
-//   onDisableClicked: (date: moment) => void,
-//   focusedMonth:?moment
-// }
-
-// type MonthType = {
-//   range: boolean,
-//   date: ?moment,
-//   startDate: ?moment,
-//   endDate: ?moment,
-//   focusedInput: 'startDate' | 'endDate',
-//   currentDate: moment,
-//   focusedMonth: moment,
-//   onDatesChange: (date: { date?: ?moment, startDate?: ?moment, endDate?: ?moment }) => void,
-//   isDateBlocked: (date: moment) => boolean,
-//   onDisableClicked: (date: moment) => void
-// }
-
-// type WeekType = {
-//   range: boolean,
-//   date: ?moment,
-//   startDate: ?moment,
-//   endDate: ?moment,
-//   focusedInput: 'startDate' | 'endDate',
-//   startOfWeek: moment,
-//   onDatesChange: (date: { date?: ?moment, startDate?: ?moment, endDate?: ?moment }) => void,
-//   isDateBlocked: (date: moment) => boolean,
-//   onDisableClicked: (date: moment) => void
-// }
-
-const styles = StyleSheet.create({
-  calendar: {
-    backgroundColor: 'rgb(255, 255, 255)'
-  },
-  heading: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20
-  },
-  week: {
-    flexDirection: 'row'
-  },
-  dayName: {
-    flexGrow: 1,
-    flexBasis: 1,
-    textAlign: 'center',
-  },
-  day: {
-    flexGrow: 1,
-    flexBasis: 1,
-    alignItems: 'center',
-    backgroundColor: 'rgb(245, 245, 245)',
-    margin: 1,
-    padding: 10
-  },
-  dayBlocked: {
-    backgroundColor: 'rgb(255, 255, 255)'
-  },
-  daySelected: {
-    backgroundColor: 'rgb(52,120,246)'
-  },
-  dayText: {
-    color: 'rgb(0, 0, 0)',
-    fontWeight: '600'
-  },
-  dayDisabledText: {
-    color: 'gray',
-    opacity: 0.5,
-    fontWeight: '400'
-  },
-  daySelectedText: {
-    color: 'rgb(252, 252, 252)'
-  }
-});
 
 const dates = (startDate: moment, endDate: moment, focusedInput: 'startDate' | 'endDate') => {
   if (focusedInput === 'startDate') {
@@ -254,11 +173,13 @@ export const Month = (props) => {
 };
 
 export default class Dates extends Component {
-  state = {
-    currentDate: moment(),
-    focusedMonth: moment().startOf('month')
+  constructor(props) {
+    super(props)
+    this.state = {
+      currentDate: moment(),
+      focusedMonth: moment().startOf('month')
+    }
   }
-
   componentDidMount() {
     this.setFocusedMonth();
   }
@@ -272,6 +193,7 @@ export default class Dates extends Component {
 
 
   render() {
+    console.log("prps", this.props)
     const previousMonth = () => {
       this.setState({ focusedMonth: this.state.focusedMonth.add(-1, 'M') });
     };
@@ -281,12 +203,15 @@ export default class Dates extends Component {
     };
 
     return (
-      <View style={styles.calendar}>
-        <View style={styles.heading}>
+      <View style={styles.container}>
+        <View style={styles.header}>
           <TouchableOpacity onPress={previousMonth}>
-            <Text>{'< Previous'}</Text>
+            <Image
+              source={require("../src/image/left-arrow.png")}
+              style={styles.arrow}
+            />
           </TouchableOpacity>
-          <Text>
+          <Text style={styles.headerText}>
             {this.state.focusedMonth.format('MMMM')
               +
               " "
@@ -294,24 +219,104 @@ export default class Dates extends Component {
               this.state.focusedMonth.format('YYYY')
             }
           </Text>
-
           <TouchableOpacity onPress={nextMonth}>
-            <Text>{'Next >'}</Text>
+            <Image
+              source={require("../src/image/right-arrow.png")}
+              style={styles.arrow}
+            />
           </TouchableOpacity>
         </View>
-        <Month
-          range={this.props.range}
-          date={this.props.date}
-          startDate={this.props.startDate}
-          endDate={this.props.endDate}
-          focusedInput={this.props.focusedInput}
-          currentDate={this.state.currentDate}
-          focusedMonth={this.state.focusedMonth}
-          onDatesChange={this.props.onDatesChange}
-          isDateBlocked={this.props.isDateBlocked}
-          onDisableClicked={this.props.onDisableClicked}
-        />
+        <View style={styles.calendar}>
+          <Month
+            range={this.props.range}
+            date={this.props.date}
+            startDate={this.props.startDate}
+            endDate={this.props.endDate}
+            focusedInput={this.props.focusedInput}
+            currentDate={this.state.currentDate}
+            focusedMonth={this.state.focusedMonth}
+            onDatesChange={this.props.onDatesChange}
+            isDateBlocked={this.props.isDateBlocked}
+            onDisableClicked={this.props.onDisableClicked}
+          />
+        </View>
       </View>
+
     );
   }
 }
+
+
+
+
+const styles = StyleSheet.create({
+  calendar: {
+    backgroundColor: '#ebedf6',
+    marginHorizontal: 14,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#ebedf6",
+  },
+  header: {
+    height: 40,
+    backgroundColor: "#2fca99",
+    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24
+  },
+  headerText: {
+    fontSize: 16,
+    color: "#FFF",
+    fontWeight: "500",
+    marginHorizontal: 20
+
+  },
+  week: {
+    flexDirection: 'row'
+  },
+  dayName: {
+    flexGrow: 1,
+    flexBasis: 1,
+    margin: 1,
+    padding: 10,
+    textAlign: 'center',
+    color: "#424f92",
+    fontWeight: '600',
+    backgroundColor: "#FFF"
+
+  },
+  day: {
+    flexGrow: 1,
+    flexBasis: 1,
+    alignItems: 'center',
+    backgroundColor: 'rgb(245, 245, 245)',
+    margin: 1,
+    padding: 10,
+
+  },
+  dayBlocked: {
+    backgroundColor: 'rgb(255, 255, 255)'
+  },
+  daySelected: {
+    backgroundColor: 'rgb(52,120,246)'
+  },
+  dayText: {
+    // color: 'rgb(0, 0, 0)',
+    color: "#424f92",
+    fontWeight: '600'
+  },
+  dayDisabledText: {
+    color: 'gray',
+    opacity: 0.5,
+    fontWeight: '400'
+  },
+  daySelectedText: {
+    color: 'rgb(252, 252, 252)'
+  },
+  arrow: {
+    height: 10,
+    width: 10
+  }
+});
